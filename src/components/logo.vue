@@ -18,6 +18,7 @@ export default {
 }
 .logo {
   width: 100px;
+  height: 100px;
   animation: logoRotate 4s;
 }
 
