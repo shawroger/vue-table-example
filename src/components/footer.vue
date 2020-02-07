@@ -1,11 +1,11 @@
 <template>
   <div id="app-footer">
-    <p>{{title}} · 2020 </p>
+    <p>{{title}} · Powered by vue-table@shawroger </p>
   </div>
 </template>
 
 <script lang="ts">
-import { title } from "@/utils/sources";
+import { title } from "@/utils/config";
 import { createComponent } from "@vue/composition-api";
 export default createComponent({
   name: "app-footer",
