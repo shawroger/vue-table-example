@@ -40,6 +40,7 @@
 					type="index"
 					label="序号"
 					align="center"
+					width="60"
 					:index="e => e + (currentPage - 1) * pageSize + 1"
 				>
 				</el-table-column>
@@ -55,7 +56,9 @@
 
 		<div class="page-pagination">
 			<el-pagination
+				ref="pagination"
 				v-if="width > 768"
+				:current-page="currentPage"
 				@current-change="
 					e => {
 						currentPage = e;
@@ -68,7 +71,7 @@
 				"
 				@prev-click="currentPage--"
 				@next-click="currentPage++"
-				:page-sizes="[10, 20, 30, 40]"
+				:page-sizes="[5, 10, 20, 50, 100]"
 				layout="total, sizes, prev, pager, next, jumper"
 				:total="tableData.length"
 			>
@@ -76,6 +79,7 @@
 
 			<el-pagination
 				v-else
+				:current-page="currentPage"
 				layout="prev, pager, next"
 				:total="tableData.length"
 				@current-change="
@@ -98,9 +102,16 @@
 </template>
 
 <script lang="ts">
-import { createComponent, ref, reactive, computed } from "@vue/composition-api";
+import {
+	createComponent,
+	ref,
+	reactive,
+	computed,
+	watch,
+	onUnmounted
+} from "@vue/composition-api";
 
-import { title, fileRenderList } from "@/utils/config";
+import { title, fileRenderList, fileHeader } from "@/utils/config";
 import { arrayToJson } from "@/services/rexine/format";
 import { getCsvFile } from "@/services/fetch";
 import { useWindow } from "@/utils/useHooks";
@@ -114,13 +125,15 @@ export default createComponent({
 	setup() {
 		const pageSize = ref(10);
 		const currentPage = ref(1);
+
 		const popoverStatus = ref(false);
 		const sortByClass = ref(false);
+
 		const sourceData = ref([] as any[]);
 		const propsList = ref([] as any[]);
 
 		const { width } = useWindow();
-		const labelList = ["序号", "班级", "姓名", "学校"];
+		const labelList = fileHeader;
 
 		const state = reactive({
 			class: "",
@@ -151,6 +164,21 @@ export default createComponent({
 				}
 			})();
 		}
+
+		const watchPages = watch(
+			[() => state.class, () => state.name, () => state.school],
+			() => {
+				currentPage.value = 1;
+			},
+			{
+				lazy: true
+			}
+		);
+
+		onUnmounted(() => {
+			watchPages();
+		});
+
 		created();
 
 		return {
@@ -175,6 +203,7 @@ export default createComponent({
 	right: 10px;
 }
 </style>
+
 <style lang="less" scoped>
 #app {
 	.popover-card {
